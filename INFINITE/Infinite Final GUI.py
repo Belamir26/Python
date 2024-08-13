@@ -100,6 +100,8 @@ def conectar():
             ser.setDTR(False)
             messagebox.showinfo(message=f"Conexión establecida con éxito en {serial_port} a {baud_rate} baudios.", title="Infinite")
             print(f"Conexión establecida con éxito en {serial_port} a {baud_rate} baudios.") 
+            btConectar.config(state='disabled')
+            btActualizar.config(state='disabled')
         except SerialException as e:
             print(f"Error al intentar conectar: {e}")
     else:
@@ -111,20 +113,40 @@ def actualizar_COM():
 
 
 def reanudar():
-    pass
+    anim.event_source.start()
+    anim2.event_source.start()
+    anim3.event_source.start()
+    btReanudar.config(state='disabled')
 
 def pausar():
-    pass
+    anim.event_source.stop()
+    anim2.event_source.stop()
+    anim3.event_source.stop()
+    btReanudar.config(state='normal')
+    
 
 
 
 #Mejorar esto aca!!!
 def salir():
+    btProceso.config(state='normal')
+    x2=check_grafica.get()
+    if(x2):
+        anim.event_source.stop()
+        anim2.event_source.stop()
+        anim3.event_source.stop()
+    checkDatos.config(state='normal')
+    checkGrafica.config(state='normal')
+    global isRun
+    isRun = False
     ser.close()
-    pass
+    btConectar.config(state='normal')
+    btActualizar.config(state='normal')
 
 
 def bt_proceso():
+    btProceso.config(state='disabled')
+    btReanudar.config(state='disabled')
     #take from GUI interface, the labels, check buttons, and combo boxes
     x=0
     name= name_entry.get()
@@ -134,43 +156,46 @@ def bt_proceso():
 
     x1=check_datos.get() # toca buscar cual es para iniciar el sub proceso 
     x2=check_grafica.get()
+    checkDatos.config(state='disabled')
+    checkGrafica.config(state='disabled')
 
     
 
 
     if x1 and x2:
         x=1
-        sub_proceso(x, destime, name, grip, test, labeltimer, labelestado, labelnumacc)
+        sub_proceso(x, destime, name, grip, test, labeltimer, labelestado)
         messagebox.showinfo(message="Evento Datos y grafica", title="Infinite")
 
     elif x1:
         x=2
         messagebox.showinfo(message="Evento datos", title="Infinite")
-        sub_proceso(x, destime, name, grip, test, labeltimer, labelestado, labelnumacc)
+        sub_proceso(x, destime, name, grip, test, labeltimer, labelestado)
 
     elif x2:
         x=3
         messagebox.showinfo(message="Evento grafica", title="Infinite")
-        sub_proceso(x, destime, name, grip, test, labeltimer, labelestado, labelnumacc)
+        sub_proceso(x, destime, name, grip, test, labeltimer, labelestado)
     else:
         messagebox.showinfo(message="Evento no seleeccionado", title="Infinite")
 
 
-def sub_proceso(x, destime, name, grip, test, labeltimer, labelestado,labelnumacc ):
-
+def sub_proceso(x, destime, name, grip, test, labeltimer, labelestado ):
+    global isRun
+    isRun = True
     try:
         if x == 1:
             print("x=1")
             start_time = time.time()
             end_time = start_time + int(destime)
-            Thread(target=acq_sensor_data, args=(name, grip, test, labeltimer, start_time, end_time, labelestado, labelnumacc)).start()
+            Thread(target=acq_sensor_data, args=(name, grip, test, labeltimer, start_time, end_time, labelestado)).start()
             iniciar_animaciones()
 
         elif x == 2:
             print("x=2")
             start_time = time.time()
             end_time = start_time + int(destime)
-            Thread(target=acq_sensor_data, args=(name, grip, test, labeltimer, start_time, end_time, labelestado, labelnumacc)).start()
+            Thread(target=acq_sensor_data, args=(name, grip, test, labeltimer, start_time, end_time, labelestado)).start()
 
         elif x == 3:
             print("x=3")
@@ -284,6 +309,7 @@ def plotData2(i):
     line88.set_data(range(muestras),datos_EMG8)
 
 def iniciar_animaciones():
+    global anim, anim2, anim3
     anim = animation.FuncAnimation(plot1, plotData1, interval=100, blit=False)
     anim2 = animation.FuncAnimation(plot2, plotData2, interval=100, blit=False)
     anim3 = animation.FuncAnimation(plot3, plotData3, interval=100, blit=False)
@@ -294,16 +320,19 @@ def iniciar_animaciones():
 
 #HILos
 def acq_sensor_plot():
-    while True:
+    global isRun
+    while isRun:
         global datos
         if ser.in_waiting > 0:
             datos = ser.readline().decode('utf-8').strip()
 
-def acq_sensor_data(name,grip, test, labeltimer, start_time, end_time, labelestado, labelnumacc):
+def acq_sensor_data(name,grip, test, labeltimer, start_time, end_time, labelestado):
     global df
     global datos
     df = pd.DataFrame(None)
     df = pd.DataFrame(columns=columns)
+    global anim, anim2, anim3
+
 
     
     accion=0
@@ -342,6 +371,13 @@ def acq_sensor_data(name,grip, test, labeltimer, start_time, end_time, labelesta
     file_name = f"{name}_{grip}_{test}_{time.strftime('%m_%d_%H_%M_%S')}.xlsx"
     df.to_excel(file_name, index=False)
     print(f"Archivo guardado como {file_name}")
+
+
+    x2=check_grafica.get()
+    if x2:
+        anim.event_source.stop()
+        anim2.event_source.stop()
+        anim3.event_source.stop()
     ser.close()
 
 
@@ -413,9 +449,9 @@ checkDatos.grid(row=4,column=3, padx=10,pady=5)
 
 btProceso = Button(frame22,command= bt_proceso, text= "Proceso ",bg="white",fg="black", font="Helvetica 14 bold",width=12,justify="center")
 btProceso.grid(row=5,column=2, padx=10,pady=5)
-btReanudar = Button(frame22,command= None, text= "Reanudar ",bg="white",fg="black", font="Helvetica 14 bold",width=12,justify="center")
+btReanudar = Button(frame22,command= reanudar, text= "Reanudar ",bg="white",fg="black", font="Helvetica 14 bold",width=12,justify="center")
 btReanudar.grid(row=5,column=1, padx=10,pady=5)
-btPausar = Button(frame22,command= None, text= "Pausar ",bg="white",fg="black", font="Helvetica 14 bold",width=12,justify="center")
+btPausar = Button(frame22,command= pausar, text= "Pausar ",bg="white",fg="black", font="Helvetica 14 bold",width=12,justify="center")
 btPausar.grid(row=5,column=3, padx=10,pady=5)
 btSalir = Button(frame22,command= salir, text= "Salir ",bg="white",fg="black", font="Helvetica 14 bold",width=12,justify="center")
 btSalir.grid(row=6,column=2, padx=10,pady=5)
