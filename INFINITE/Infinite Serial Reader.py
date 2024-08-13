@@ -8,13 +8,13 @@ from threading import Thread
 import time
 
 
-serial_port = 'COM13'  # Replace with your serial port
+serial_port = 'COM3'  # Replace with your serial port
 baud_rate = 115200  # Replace with your baud rate
 ser = serial.Serial(serial_port, baud_rate)
 ser.setRTS(False)
 ser.setDTR(False)
 
-muestras=100
+muestras=50
 
 plot1, ax1 =plt.subplots(facecolor='#000000', dpi=200, figsize=(4,2))
 plt.title("IMU-Accel",color='white',size=12,family="Arial")
@@ -24,7 +24,7 @@ line2, = ax1.plot([],[], color= 'orange', linewidth=2,label='ay')
 line3, = ax1.plot([],[], color= 'green', linewidth=2,label='az')
 plt.legend(loc='upper right', facecolor="w", fontsize=3)
 plt.xlim([0,muestras])
-plt.ylim([-3,3])
+plt.ylim([-2,2])
 datos_IMU1 = collections.deque([0]*muestras, maxlen=muestras)
 datos_IMU2 = collections.deque([0]*muestras, maxlen=muestras)
 datos_IMU3 = collections.deque([0]*muestras, maxlen=muestras)
@@ -60,7 +60,7 @@ line87, = ax2.plot([],[], color= 'brown', linewidth=2,label='7Ch')
 line88, = ax2.plot([],[], color= 'cyan',linewidth=2,label='8Ch')
 plt.legend(loc='upper right', facecolor="w", fontsize=3)
 plt.xlim([0,muestras])
-plt.ylim([0,4])
+plt.ylim([0,3.5])
 
 datos_EMG1 = collections.deque([0]*muestras, maxlen=muestras)
 datos_EMG2 = collections.deque([0]*muestras, maxlen=muestras)
