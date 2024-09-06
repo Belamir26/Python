@@ -69,12 +69,12 @@ line87, = ax2.plot([],[], color= 'brown', linewidth=2,label='7Ch')
 line88, = ax2.plot([],[], color= 'cyan',linewidth=2,label='8Ch')
 plt.legend(loc='upper right', facecolor="w", fontsize=3)
 plt.xlim([0,muestras])
-plt.ylim([0,4])
+plt.ylim([0,3.4])
 
 
 
 #CV
-columns = ['ax','ay','az','gx','gy','gz', 't' ,'s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8' ,'mili']
+columns = ['ax','ay','az','gx','gy','gz', 't' ,'s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8' ,'mili','Status']
 
 
 #Funciones GUI
@@ -348,8 +348,11 @@ def acq_sensor_data(name,grip, test, labeltimer, start_time, end_time, labelesta
         if ser.in_waiting > 0:
             datos = ser.readline().decode('utf-8').strip()
             data = datos.split(',')
-            data = [0 if float(x) > 8 else float(x) for x in data] # errores de 12V 
-            
+            if seconds % 20 < 10:
+                #Resposo
+                data.append(0)
+            else:
+                data.append(1)
             df.loc[len(df)] = data
         
 
@@ -457,7 +460,7 @@ btSalir = Button(frame22,command= salir, text= "Salir ",bg="white",fg="black", f
 btSalir.grid(row=6,column=2, padx=10,pady=5)
 
 
-agarres = ['TEST','POCILLO','CLOSE']
+agarres = ['Test','Cilindric','CloseHand','Handle', 'Pinch', 'PointTripod', 'Tripod']
 grip_combo= ttk.Combobox(frame22, values=agarres,background= "#bdffff",foreground="black", font="Helvetica 14 bold",width=20 ,justify="left" )
 grip_combo.grid(row=1,column=2, padx=10,pady=5)
 

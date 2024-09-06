@@ -8,7 +8,7 @@ from threading import Thread
 import time
 import numpy as np
 
-serial_port = 'COM13'  # Replace with your serial port
+serial_port = 'COM8'  # Replace with your serial port
 baud_rate = 115200  # Replace with your baud rate
 ser = serial.Serial(serial_port, baud_rate)
 ser.setRTS(False)
@@ -54,6 +54,8 @@ def acq_sensor():
             # ax.set_ylim([0, 3.5])
             grafica1.draw()
             
+
+
 
 
 
