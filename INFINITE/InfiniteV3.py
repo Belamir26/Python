@@ -177,18 +177,19 @@ def plotDataGyro(i):
 def plotDataEMG(i):
     global EMG
     EMGdatos= EMG
-    EMGdatos += EMG[:1]
+    if len(EMGdatos)==8:
+        EMGdatos += EMG[:1]
 
-    ax.clear()
-    ax.set_theta_offset(np.pi / 2)
-    ax.set_theta_direction(-1)
-    plt.xticks(angles[:-1], columnss)
-    plt.ylim([0, 3.5])
-    ax.set_ylim([0, 3.5])
-    ax.plot(angles, EMGdatos)
-    # plt.ylim([0, 3.5])
-    # ax.set_ylim([0, 3.5])
-    graficaEMG.draw()
+        ax.clear()
+        ax.set_theta_offset(np.pi / 2)
+        ax.set_theta_direction(-1)
+        plt.xticks(angles[:-1], columnss)
+        plt.ylim([0, 3.5])
+        ax.set_ylim([0, 3.5])
+        ax.plot(angles, EMGdatos)
+        # plt.ylim([0, 3.5])
+        # ax.set_ylim([0, 3.5])
+        graficaEMG.draw()
 
 def iniciar_animaciones():
     global anim1,anim2, anim3
@@ -284,10 +285,10 @@ def acq_sensor_data(name,grip, tag, labeltimer, destime, labelestado):
                 label_numacc.set("#Accion " + str(accion))
 
         if elapsed_time % (rest_duration + action_duration) < rest_duration:
-            tiempo_set = seconds- current_set*(8)  +1
+            tiempo_set = (seconds- current_set*(8)  +1) + (minutes *60)
             labelestado.config(text="Reposo: "+ str(tiempo_set), background="#22a374")
         else:
-            tiempo_set = seconds- ((current_set- 1) * 8) -3   +1
+            tiempo_set = seconds- (((current_set- 1) * 8) -3   +1) + (minutes *60) -4
             labelestado.config(text="Accion: "+ str(tiempo_set), background="#CB4154")
 
             
@@ -311,7 +312,7 @@ def acq_sensor_data(name,grip, tag, labeltimer, destime, labelestado):
 
 
 root = Tk()
-root.title("Infinite")
+root.title("Infinit8I")
 
 frame1 = Frame(root, width=700, height=350, bg="#07396b")
 frame1.grid(row=0, column=0)
