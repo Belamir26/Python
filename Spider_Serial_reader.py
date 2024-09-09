@@ -28,6 +28,9 @@ plt.xticks(angles[:-1], columns)
 ax.plot([], [], linewidth=2, linestyle='solid')
 plt.ylim([0,3.5])
 ax.set_ylim([0, 3.5])
+
+
+
 def process():
     global datos
     hilo.start()
@@ -55,7 +58,15 @@ def acq_sensor():
             grafica1.draw()
             
 
+# Cambiar el color de las líneas del subplot
+ax.yaxis.grid(True, color='red', linestyle='--', linewidth=1)  # Líneas radiales en rojo
+ax.xaxis.grid(True, color='red', linestyle='--', linewidth=1)  # Líneas circunferenciales en rojo
 
+# Agregar una línea de ejemplo
+values = [2, 3, 2.5, 3, 1.5, 2, 3, 2]
+values += values[:1]  # Cerrar el polígono
+ax.plot(angles, values, linewidth=2, linestyle='solid', color='black')
+ax.fill(angles, values, alpha=0.25, color='black')  
 
 
 

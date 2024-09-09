@@ -348,8 +348,7 @@ def acq_sensor_data(name,grip, test, labeltimer, start_time, end_time, labelesta
         if ser.in_waiting > 0:
             datos = ser.readline().decode('utf-8').strip()
             data = datos.split(',')
-            columns = ['ax','ay','az','gx','gy','gz', 't' ,'s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8' ,'mili','Status']
-
+            
             data[7:15] = [0 if x > 5 else x for x in data[7:15]]
             if seconds % 20 < 10:
                 #Resposo
@@ -501,8 +500,7 @@ labelbaud = Label(frame32,text="Baudrates", bg= "#57bd9e",fg="black", font="Helv
 labelbaud.grid(row=3,column=1, padx=5,ipady=8, pady=5)
 
 baudlist = ['9600','115200']
-baud_combo= ttk.Combobox(frame32, values=baudlist,background= "#bdffff",foreground="black", font="Helvetica 14 bold",width=20 ,justify="left" )
-baud_combo.grid(row=4,column=1, padx=10,pady=5)
+
 
 btConectar = Button(frame32,command= conectar, text= "Conectar ",bg="white",fg="black", font="Helvetica 14 bold",width=12,justify="center")
 btConectar.grid(row=5,column=1, padx=10,pady=5)
