@@ -352,13 +352,14 @@ label_grip= StringVar(root, "Grip:")
 label_ntext= StringVar(root, "Tag:")
 label_dtime= StringVar(root, "DesiredTime:")
 grips = {
-  "Test": ["UDEA.jpg","50"],
-  "Cilindric": ["im2","1"],
-  "CloseHand": ["im3","2"],
-  "Handle": ["im1","3"],
-  "Pinch": ["im2","4"],
-  "PointTripod": ["im3","5"],
-  "Tripod": ["im3","6"]
+  "Test": ["UDEA.jpg","88"],
+  "Base": ["UDEA.jpg","0"],
+  "Lateral": ["im2","17"],
+  "WritingTripod": ["im3","9"],
+  "MediumWrap": ["im1","5"],
+  "Tripod": ["im2","13"],
+  "PowerSphere": ["im3","10"],
+  "Ring": ["im3","6"]
 }
 agarres = list(grips.keys())
 
