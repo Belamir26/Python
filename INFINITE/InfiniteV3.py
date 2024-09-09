@@ -101,8 +101,17 @@ def actualizar_COM():
     comlist= [port.device for port in serial.tools.list_ports.comports()]
     com_combo.config(values=comlist)
 
+def reanudar():
+    anim1.event_source.start()
+    anim2.event_source.start()
+    anim3.event_source.start()
+    btReanudar.config(state='disabled')
 
-
+def pausar():
+    anim1.event_source.stop()
+    anim2.event_source.stop()
+    anim3.event_source.stop()
+    btReanudar.config(state='normal')
 
 def salir():
     btProceso.config(state='normal')
@@ -117,7 +126,6 @@ def salir():
     btConectar.config(state='normal')
     btActualizar.config(state='normal')
 
-
 def bt_proceso():
     global isRun
     isRun = True
@@ -130,15 +138,15 @@ def bt_proceso():
         #take from GUI interface, the labels, check buttons, and combo boxes
         name= name_entry.get()
         grip= grip_combo.get()  
-        test= test_entry.get()
+        tag= tag_entry.get()
         destime= time_entry.get()
 
 
     if check_datos.get() and check_grafica.get():
-        Thread(target=acq_sensor_data, args=(name, grip, test, labeltimer, destime, labelestado)).start()
+        Thread(target=acq_sensor_data, args=(name, grip, tag, labeltimer, destime, labelestado)).start()
         iniciar_animaciones()
     elif check_datos.get():
-        Thread(target=acq_sensor_data, args=(name, grip, test, labeltimer, destime, labelestado)).start()
+        Thread(target=acq_sensor_data, args=(name, grip, tag, labeltimer, destime, labelestado)).start()
     elif check_grafica.get():
         messagebox.showinfo(message="Grafica", title="Infinite")
         Thread(target=acq_sensor_plot).start()
@@ -146,35 +154,7 @@ def bt_proceso():
     else:
         messagebox.showinfo(message="No se selecciono nada", title="Infinite")
         
-
-def sub_proceso(x, destime, name, grip, test, labeltimer, labelestado ):
-    global isRun
-    isRun = True
-    try:
-        if x == 1:
-            print("x=1")
-            start_time = time.time()
-            end_time = start_time + int(destime)
-            Thread(target=acq_sensor_data, args=(x,name, grip, test, labeltimer, start_time, end_time, labelestado)).start()
-            iniciar_animaciones()
-
-        elif x == 2:
-            print("x=2")
-            start_time = time.time()
-            end_time = start_time + int(destime)
-            Thread(target=acq_sensor_data, args=(x,name, grip, test, labeltimer, start_time, end_time, labelestado)).start()
-
-        elif x == 3:
-            print("x=3")
-            Thread(target=acq_sensor_plot).start()
-            iniciar_animaciones()
-
-    except Exception as e:
-        print(f"Error en sub_proceso: {e}")
-
-
 #Subfunciones
-
 def plotDataAccel(i):
     global IMUACCEL
     datos_IMU1.append(IMUACCEL[0])
@@ -239,11 +219,17 @@ def acq_sensor_plot():
                 print(data)
 
 
-def acq_sensor_data(name,grip, test, labeltimer, destime, labelestado):
+def acq_sensor_data(name,grip, tag, labeltimer, destime, labelestado):
     global EMG, IMUACCEL,IMUGYRO
 
     global df
     global datos
+    print(grip)
+    imm = grips.get(grip)
+    im= imm[0]
+    infinitlogo = ImageTk.PhotoImage(Image.open(im).resize((250, 250))) 
+    imageinfinit.config(image=infinitlogo)
+
     df = pd.DataFrame(None)
     df = pd.DataFrame(columns=columns)
     global anim1, anim2, anim3
@@ -282,7 +268,8 @@ def acq_sensor_data(name,grip, test, labeltimer, destime, labelestado):
                 if elapsed_time % (rest_duration + action_duration) < rest_duration:
                     data.append(0)
                 else:
-                    data.append(1) #Este apend depende del combobox                   
+                    data.append(imm[1]) #Este apend depende del combobox    
+                               
                 df.loc[len(df)] = data
 
             else:
@@ -308,7 +295,7 @@ def acq_sensor_data(name,grip, test, labeltimer, destime, labelestado):
 
         
         time.sleep(0.001)
-    file_name = f"{name}_{grip}_{test}_{time.strftime('%m_%d_%H_%M_%S')}.xlsx"
+    file_name = f"{name}_{grip}_{tag}_{time.strftime('%m_%d_%H_%M_%S')}.xlsx"
     df.to_excel(file_name, index=False)
     print(f"Archivo guardado como {file_name}")
 
@@ -363,7 +350,17 @@ label_nombre= StringVar(root, "Name:")
 label_grip= StringVar(root, "Grip:")
 label_ntext= StringVar(root, "Tag:")
 label_dtime= StringVar(root, "DesiredTime:")
-agarres = ['Test','Cilindric','CloseHand','Handle', 'Pinch', 'PointTripod', 'Tripod']
+grips = {
+  "Test": ["UDEA.jpg","50"],
+  "Cilindric": ["im2","1"],
+  "CloseHand": ["im3","2"],
+  "Handle": ["im1","3"],
+  "Pinch": ["im2","4"],
+  "PointTripod": ["im3","5"],
+  "Tripod": ["im3","6"]
+}
+agarres = list(grips.keys())
+
 check_grafica = IntVar()
 check_datos = IntVar()
 check_tiempo = IntVar()
@@ -374,15 +371,15 @@ labelgrip = Label(frame3,textvariable = label_grip, bg= "#85b7e9",fg="black", fo
 labelntext = Label(frame3,textvariable = label_ntext, bg= "#85b7e9",fg="black", font="Helvetica 14 bold",width=12 ,justify="center")
 labeldtime = Label(frame3,textvariable = label_dtime, bg= "#85b7e9",fg="black", font="Helvetica 14 bold",width=12 ,justify="center")
 name_entry= Entry(frame3, bg= "#85b7e9",fg="black", font="Helvetica 14 bold",width=18 ,justify="left")
-test_entry= Entry(frame3, bg= "#85b7e9",fg="black", font="Helvetica 14 bold",width=18 ,justify="left")
+tag_entry= Entry(frame3, bg= "#85b7e9",fg="black", font="Helvetica 14 bold",width=18 ,justify="left")
 time_entry= Entry(frame3, bg= "#85b7e9",fg="black", font="Helvetica 14 bold",width=10 ,justify="left")
 checkTiempo = Checkbutton(frame3,text='Sets', bg='white', fg='black', font="Helvetica 14 bold",width=3, variable=check_tiempo)
 grip_combo= ttk.Combobox(frame3, values=agarres,background= "#bdffff",foreground="black", font="Helvetica 14 bold",width=12 ,justify="center" )
 checkGrafica = Checkbutton(frame3, text='Plot', bg='white', fg='black', font="Helvetica 14 bold",width=10, variable=check_grafica)
 checkDatos = Checkbutton(frame3, text='Data ACQ', bg='white', fg='black', font="Helvetica 14 bold",width=10, variable=check_datos)
 btProceso = Button(frame3,command= bt_proceso, text= "Proceso ",bg="white",fg="black", font="Helvetica 14 bold",width=12)
-btReanudar = Button(frame3,command= None, text= "Reanudar ",bg="white",fg="black", font="Helvetica 14 bold",width=12)
-btPausar = Button(frame3,command= None, text= "Pausar ",bg="white",fg="black", font="Helvetica 14 bold",width=12)
+btReanudar = Button(frame3,command= reanudar, text= "Reanudar ",bg="white",fg="black", font="Helvetica 14 bold",width=12)
+btPausar = Button(frame3,command= pausar, text= "Pausar ",bg="white",fg="black", font="Helvetica 14 bold",width=12)
 btSalir = Button(frame3,command= salir, text= "Salir ",bg="white",fg="black", font="Helvetica 14 bold",width=12)
 
 
@@ -397,7 +394,7 @@ labeldtime.grid(row=4,column=0, padx=Xpadx,pady=Ypaxy)
 
 name_entry.grid(row=1,column=1, padx=Xpadx,pady=Ypaxy,columnspan=2)
 grip_combo.grid(row=2,column=1, padx=Xpadx,pady=Ypaxy,columnspan=2)
-test_entry.grid(row=3,column=1, padx=Xpadx,pady=Ypaxy,columnspan=2)
+tag_entry.grid(row=3,column=1, padx=Xpadx,pady=Ypaxy,columnspan=2)
 time_entry.grid(row=4,column=1, padx=0,pady=0)
 checkTiempo.grid(row=4,column=2, padx=0,pady=0)
 
@@ -433,12 +430,13 @@ btConectar.grid(row=3,column=0,  padx=20,pady=Ypaxy)
 btActualizar.grid(row=3,column=1,  padx=20,pady=Ypaxy)
 
 #FRAME 5
+imagess=["menu-logo.jpg","sense.jpg","logo2.jpg"]
 label_temp= StringVar(frame5, "TEMP: 0.0°C")
 label_numacc= StringVar(frame5, "#Accion 0")
 
-protlogo = ImageTk.PhotoImage(Image.open("menu-logo.jpg").resize((140, 80))) 
-senselogo = ImageTk.PhotoImage(Image.open("sense.jpg").resize((140, 80))) 
-infinitlogo = ImageTk.PhotoImage(Image.open("logo2.jpg").resize((250, 250))) 
+protlogo = ImageTk.PhotoImage(Image.open(imagess[0]).resize((140, 80))) 
+senselogo = ImageTk.PhotoImage(Image.open(imagess[1]).resize((140, 80))) 
+infinitlogo = ImageTk.PhotoImage(Image.open(imagess[2]).resize((250, 250))) 
 labeltemp = Label(frame5,textvariable = label_temp, bg= "#85b7e9",fg="black", font="Helvetica 14 bold",width=12 ,justify="left")
 labeltimer = Label(frame5,text="00:00:000", bg= "#85b7e9",fg="black", font="Helvetica 14 bold",width=12 ,justify="left")
 labeltimer2 = Label(frame5,text="00", bg= "#85b7e9",fg="black", font="Helvetica 14 bold",width=4 ,justify="left")
@@ -459,4 +457,6 @@ labelnumacc.grid(row=5,column=0,  padx=Xpadx,pady=Ypaxy,columnspan=2)
 imageprot.grid(row=0,column=0, padx=Xpadx,pady=20)
 imagesense.grid(row=0,column=1, padx=Xpadx,pady=20)
 imageinfinit.grid(row=6,column=0, padx=Xpadx,pady=20,columnspan=2)
+
+
 root.mainloop()
