@@ -348,6 +348,9 @@ def acq_sensor_data(name,grip, test, labeltimer, start_time, end_time, labelesta
         if ser.in_waiting > 0:
             datos = ser.readline().decode('utf-8').strip()
             data = datos.split(',')
+            columns = ['ax','ay','az','gx','gy','gz', 't' ,'s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8' ,'mili','Status']
+
+            data[7:15] = [0 if x > 5 else x for x in data[7:15]]
             if seconds % 20 < 10:
                 #Resposo
                 data.append(0)
