@@ -352,14 +352,14 @@ label_grip= StringVar(root, "Grip:")
 label_ntext= StringVar(root, "Tag:")
 label_dtime= StringVar(root, "DesiredTime:")
 grips = {
-  "Test": ["UDEA.jpg","88"],
-  "Base": ["UDEA.jpg","0"],
-  "Lateral": ["im2","17"],
-  "WritingTripod": ["im3","9"],
-  "MediumWrap": ["im1","5"],
-  "Tripod": ["im2","13"],
-  "PowerSphere": ["im3","10"],
-  "Ring": ["im3","6"]
+  "Test": ["IM\Infinit.jpg","88"],
+  "Base": ["IM\Infinit.jpg","0"],
+  "Lateral": ["IM\Lateral.jpg","17"],
+  "WritingTripod": ["IM\WritingTripod.jpg","9"],
+  "MediumWrap": ["IM\MediumWrap.jpg","5"],
+  "Tripod": ["IM\Tripod.jpg","13"],
+  "PowerSphere": ["IM\PowerSphere.jpg","10"],
+  "Ring": ["IM\Ring.jpg","6"]
 }
 agarres = list(grips.keys())
 
@@ -432,7 +432,10 @@ btConectar.grid(row=3,column=0,  padx=20,pady=Ypaxy)
 btActualizar.grid(row=3,column=1,  padx=20,pady=Ypaxy)
 
 #FRAME 5
-imagess=["menu-logo.jpg","sense.jpg","logo2.jpg"]
+imagess=["IM\Lateral.jpg","IM\Sense.jpg","IM\Infinit.jpg"]
+
+
+
 label_temp= StringVar(frame5, "TEMP: 0.0°C")
 label_numacc= StringVar(frame5, "#Accion 0")
 

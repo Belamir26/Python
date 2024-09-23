@@ -8,7 +8,7 @@ from threading import Thread
 import time
 import numpy as np
 
-serial_port = 'COM9'  # Replace with your serial port
+serial_port = 'COM5'  # Replace with your serial port
 baud_rate = 115200  # Replace with your baud rate
 ser = serial.Serial(serial_port, baud_rate)
 ser.setRTS(False)
